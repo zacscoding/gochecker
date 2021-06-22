@@ -1,3 +1,5 @@
+[![Go Reference](https://pkg.go.dev/badge/github.com/zacscoding/gochecker.svg)](https://pkg.go.dev/github.com/zacscoding/gochecker) ![workflow](https://github.com/zacscoding/gochecker/actions/workflows/go.yaml/badge.svg)  
+
 :heavy_check_mark: Go Health Checker
 ===  
 
