@@ -3,9 +3,15 @@
 
 Simple health check library for ur Go application :)
 
+# Installation  
+
+```shell
+$ go get github.com/zacscoding/gochecker
+```
+
 # Usage
 
-> Create a new health checker
+> Initialize new health checker
 
 ```go
 package main
@@ -36,8 +42,10 @@ import (
 )
 
 func main() {
-	// Add health checkers database, another service
+	// Add health check components
+	// add database component
 	checker.AddChecker("MyDatabase", database.NewMySQLIndicator(db))
+	// add remote service component
 	checker.AddChecker("RemoteService-1", gochecker.NewUrlIndicator("RemoteService-1", "GET", "http://anotherservice.com", nil, time.Second*10))
 
 	// Add observers

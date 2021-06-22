@@ -6,7 +6,10 @@ import (
 	"time"
 )
 
+// Indicator is an interface to check health status.
 type Indicator interface {
+
+	// Health checks current indicator's health status.
 	Health(ctx context.Context) ComponentStatus
 }
 

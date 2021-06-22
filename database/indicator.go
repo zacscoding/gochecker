@@ -13,6 +13,7 @@ const (
 	Sqlite3VersionQuery    = "SELECT sqlite_version()"
 )
 
+// Indicator is conforms of gochecker.Indicator to check database health status.
 type Indicator struct {
 	db             *sql.DB
 	driverName     string
