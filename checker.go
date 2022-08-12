@@ -13,6 +13,16 @@ type Indicator interface {
 	Health(ctx context.Context) ComponentStatus
 }
 
+type HealthFn func(ctx context.Context) ComponentStatus
+
+type indicator struct {
+	f HealthFn
+}
+
+func (i *indicator) Health(ctx context.Context) ComponentStatus {
+	return i.f(ctx)
+}
+
 // HealthCheckerOption sets a parameter for health checker
 type HealthCheckerOption func(r *CompositeHealthChecker)
 
@@ -38,13 +48,28 @@ func (c *CompositeHealthChecker) AddChecker(name string, checker Indicator) {
 	c.checkers[name] = checker
 }
 
+// AddCheckerFn adds a health checker for given name and health check function, this indicator affect aggregated health status
+func (c *CompositeHealthChecker) AddCheckerFn(name string, f HealthFn) {
+	c.checkers[name] = &indicator{f: f}
+}
+
 // AddObserver adds a health observer with given name, this indicator does not affect aggregated health status
 func (c *CompositeHealthChecker) AddObserver(name string, checker Indicator) {
 	c.observers[name] = checker
 }
 
+// AddObserverFn adds a health observer for given name and health check function, this indicator does not affect aggregated health status
+func (c *CompositeHealthChecker) AddObserverFn(name string, f HealthFn) {
+	c.observers[name] = &indicator{f: f}
+}
+
 // Health returns a HealthStatus of components managed from this health checker
 func (c *CompositeHealthChecker) Health(ctx context.Context) *HealthStatus {
+	cacheable := c.cacheTTL != 0
+	if !cacheable {
+		return c.doHealthCheck(ctx)
+	}
+
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	if c.cacheResult != nil && time.Now().Before(c.cacheValidTime) {

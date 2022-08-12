@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+
 	"github.com/zacscoding/gochecker"
 )
 
@@ -19,6 +20,21 @@ type Indicator struct {
 	driverName     string
 	validatorQuery string
 	versionQuery   string
+}
+
+// NewMySQLIndicator creates a new mysql database health check indicator
+func NewMySQLIndicator(db *sql.DB) *Indicator {
+	return NewIndicator(db, "mysql", MySQLValidationQuery, MySQLVersionQuery)
+}
+
+// NewSqlite3Indicator creates a new sqlite3 health check indicator
+func NewSqlite3Indicator(db *sql.DB) *Indicator {
+	return NewIndicator(db, "sqlite3", Sqlite3ValidationQuery, Sqlite3VersionQuery)
+}
+
+// NewIndicator creates a new database health check indicator with given validation, version query
+func NewIndicator(db *sql.DB, driverName, validationQuery, versionQuery string) *Indicator {
+	return &Indicator{db: db, driverName: driverName, validatorQuery: validationQuery, versionQuery: versionQuery}
 }
 
 func (i *Indicator) Health(ctx context.Context) gochecker.ComponentStatus {
@@ -53,19 +69,4 @@ func (i *Indicator) Health(ctx context.Context) gochecker.ComponentStatus {
 		}
 	}
 	return *status.WithUp()
-}
-
-// NewMySQLIndicator creates a new mysql database health check indicator
-func NewMySQLIndicator(db *sql.DB) *Indicator {
-	return NewIndicator(db, "mysql", MySQLValidationQuery, MySQLVersionQuery)
-}
-
-// NewSqlite3Indicator creates a new sqlite3 health check indicator
-func NewSqlite3Indicator(db *sql.DB) *Indicator {
-	return NewIndicator(db, "sqlite3", Sqlite3ValidationQuery, Sqlite3VersionQuery)
-}
-
-// NewIndicator creates a new database health check indicator with given validation, version query
-func NewIndicator(db *sql.DB, driverName, validationQuery, versionQuery string) *Indicator {
-	return &Indicator{db: db, driverName: driverName, validatorQuery: validationQuery, versionQuery: versionQuery}
 }

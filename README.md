@@ -49,6 +49,18 @@ func main() {
 	checker.AddChecker("MyDatabase", database.NewMySQLIndicator(db))
 	// add remote service component
 	checker.AddChecker("RemoteService-1", gochecker.NewUrlIndicator("RemoteService-1", "GET", "http://anotherservice.com", nil, time.Second*10))
+	// add component with function
+	checker.AddCheckerFn("RemoteService-3", func(ctx context.Context) gochecker.ComponentStatus {
+		status := gochecker.NewComponentStatus()
+		_, err := http.Get("https://google.com")
+		if err != nil {
+			status.WithDown()
+			status.WithDetail("err", err.Error())
+			return *status
+		}
+		status.WithUp()
+		return *status
+	})
 
 	// Add observers
 	checker.AddObserver("BatchProcessor", batchProcessor)
